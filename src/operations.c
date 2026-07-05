@@ -114,7 +114,16 @@ void run_parallel_analytics_sort(int32_t *array, int size, int total_threads) {
         args[i].array = array;
         args[i].left = i * chunk_size;
         args[i].right = (i == total_threads - 1) ? (size - 1) : ((i + 1) * chunk_size - 1);
-        pthread_create(&threads[i], NULL, local_sort_worker, &args[i]);
+        int rc = pthread_create(&threads[i], NULL, local_sort_worker, &args[i]);
+        if (rc != 0) {
+            fprintf(stderr, "Error: pthread_create failed: %s\n", strerror(rc));
+            // Join any threads already started, then fall back to a serial sort.
+            for (int j = 0; j < i; j++) pthread_join(threads[j], NULL);
+            serial_quicksort(array, 0, size - 1);
+            free(threads);
+            free(args);
+            return;
+        }
     }
 
     // [TASK PARALLEL ZONE: Layer 2 - Using Cond Variables to Wait for Tasks][cite: 1]
