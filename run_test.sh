@@ -1,7 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 # ====================================================================
-# STUDENT D VALIDATION MODULE: SORTED VERIFICATION
-# ====================================================================
-echo "=================================================="
 echo "[STUDENT D] Running Sorted Verification Checks..."
 echo "=================================================="
 
